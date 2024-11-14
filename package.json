@@ -1,0 +1,20 @@
+{
+  "name": "typer-js",
+  "version": "1.0.0",
+  "description": "Type it like you mean it!",
+  "main": "dist/utils.js",
+  "types": "dist/utils.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "type": "module",
+  "author": "Demi Avaliani",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.6.3"
+  }
+}
