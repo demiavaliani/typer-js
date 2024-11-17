@@ -19,15 +19,27 @@ export class Typer {
 		if (!delay) {
 			this.actionQueue.push(() => {
 				this.element.innerText += text;
+
+				if (!this.caret) {
+					this.caret = new Caret(this.element);
+				}
+
+				this.caret.addCaret(this.element.innerText.length);
 			});
 
 			return this;
 		}
 
 		this.actionQueue.push(async () => {
+			if (!this.caret) {
+				this.caret = new Caret(this.element);
+			}
+
 			for (const letter of text) {
 				await new Promise((resolve) => setTimeout(resolve, delay));
 				this.element.innerText += letter;
+
+				this.caret.addCaret(this.element.innerText.length);
 			}
 		});
 
@@ -37,12 +49,10 @@ export class Typer {
 	public moveCaret(position: number): this {
 		this.actionQueue.push(() => {
 			if (!this.caret) {
-				this.caret = new Caret(this.element, position);
-
-				this.caret.setUpCaret();
+				this.caret = new Caret(this.element);
 			}
 
-			this.caret.addCaret();
+			this.caret.addCaret(position);
 		});
 
 		return this;
@@ -52,6 +62,8 @@ export class Typer {
 		for (const action of this.actionQueue) {
 			await action();
 		}
+
+		this.actionQueue = [];
 	}
 }
 
@@ -60,21 +72,20 @@ class Caret {
 	private range: Range | undefined;
 	private selection: Selection | null | undefined;
 	private textNode: ChildNode | null | undefined;
-	private position: number;
+	private position: number = 0;
 
-	constructor(element: HTMLElement, position: number) {
+	constructor(element: HTMLElement) {
 		this.element = element;
-		this.position = position;
 	}
 
-	public setUpCaret() {
+	public addCaret(position: number) {
 		this.textNode = this.element.firstChild;
 		this.range = new Range();
 		this.selection = window.getSelection();
-	}
 
-	public addCaret() {
 		if (this.textNode && this.range && this.selection) {
+			this.position = position;
+
 			this.element.focus();
 
 			this.range.setStart(this.textNode, this.position);
@@ -89,7 +100,7 @@ class Caret {
 
 	private addFocusChangeEventListener() {
 		document.onclick = () => {
-			this.addCaret();
+			this.addCaret(this.position);
 		};
 	}
 }
