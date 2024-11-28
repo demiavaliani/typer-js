@@ -1,0 +1,7 @@
+div {
+	pointer-events: none;
+}
+
+div:focus-visible {
+	outline: white !important;
+}
